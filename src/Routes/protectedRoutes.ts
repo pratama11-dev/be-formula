@@ -1,8 +1,6 @@
 import { Router } from 'express';
 import passport from 'passport';
 import { checkAuth } from '../Middleware/checkAuth';
-
-
 import { getExperiment } from '../Controllers/Experiment';
 
 const router = Router();

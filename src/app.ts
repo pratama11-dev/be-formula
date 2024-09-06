@@ -13,27 +13,11 @@ import cors from "cors";
 import passport from "passport";
 import { jwtStrategy } from "./passport";
 import * as path from "path";
-import { createBullBoard } from "@bull-board/api";
-import { BullMQAdapter } from "@bull-board/api/bullMQAdapter";
-import { ExpressAdapter } from "@bull-board/express";
-import { SAPQueue } from "./Utils/queue";
 
 const app = express();
 const prisma = new PrismaClient();
 
-const serverAdapter = new ExpressAdapter();
-serverAdapter.setBasePath("/admin/queues");
-const SAPQueueAdapters = Object.values(SAPQueue).map(
-  (q) => new BullMQAdapter(q),
-);
-
-createBullBoard({
-  queues: [...SAPQueueAdapters],
-  serverAdapter: serverAdapter,
-});
-
 // Middleware
-app.use("/admin/queues", serverAdapter.getRouter());
 app.use(bodyParser.json({ limit: "50mb" }));
 app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 app.use(express.json({ limit: "50mb" }));
@@ -59,25 +43,6 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 // Routes for Experimenting stuff
 app.get("/", async (req: Request, res: Response) => {
   try {
-    // console.log('test debug');
-    // // console.log(ywaouhda)
-    // const data = await req.prisma.ppic_delivery.findMany({
-    //   take: 10,
-    //   include: {
-    //     ppic_delivery_docs: {
-    //       include: {
-    //         ppic_delivery_item: {
-    //           include: {
-    //             ppic_history_item_box: true,
-    //           }
-    //         }
-    //       }
-    //     }
-    //   }
-    // })
-    // console.log(data)
-    // console.log('here')
-    // console.log(data.length)
     return res.status(200).json({ info: "it works" });
   } catch (error) {
     console.log(error);
