@@ -9,6 +9,13 @@ export class ZodSchema {
     id: z.number().optional()
   })
 
+  static ZInviteUser = z.object({
+    name: z.string(),
+    email: z.string().email('email format is not correct!'),
+    password: z.string(),
+    id_role: z.number()
+  });
+
   // static ZAddDataCalendar = z.object({
   //   title: z.string(),
   //   user: z.array(
@@ -27,7 +34,7 @@ export class ZodSchema {
   //   date_start: z.string(),
   //   date_end: z.string()
   // })
- 
+
   static convertZodToJsonSchema(schema: any, schemaName: string) {
     const jsonSchema = zodToJsonSchema(schema, schemaName);
     return jsonSchema.definitions?.[schemaName];

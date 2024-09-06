@@ -11,3 +11,18 @@ export function defaultErrorHandling(res: Response, error) {
         error: error
     })
 }
+
+export function ApiFormat(code: number, info: string, data: any) {
+    return { code, info, data };
+}
+
+export function rejectNull(str: any, label: string, res: Response) {
+    const message = `${label} cannot be empty`;
+
+    if (typeof str === "undefined") {
+        throw new Error(message);
+    }
+    if (str == null) {
+        throw new Error(message);
+    }
+}
