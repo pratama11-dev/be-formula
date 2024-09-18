@@ -7,7 +7,7 @@ generator client {
 datasource db {
   provider = "postgres"
   url      = env("DATABASE_URL")
-  schemas  = ["user"]
+  schemas  = ["user", "formula"]
 }
 
 model user {
@@ -20,6 +20,7 @@ model user {
   updated_at DateTime?
 
   user_role user_role? @relation(fields: [id_role], references: [id])
+  orders    orders[]
 
   @@index([id])
   @@schema("user")
@@ -33,4 +34,86 @@ model user_role {
 
   @@index([id])
   @@schema("user")
+}
+
+// order
+model order_status {
+  id     Int  @id() @default(autoincrement())
+  status Int?
+
+  orders orders[]
+
+  @@index([id])
+  @@schema("formula")
+}
+
+model orders {
+  id           Int       @id() @default(autoincrement())
+  id_user      Int?
+  id_status    Int?
+  total_amount Int?
+  total_price  Decimal?  @db.Decimal(19, 6)
+  created_at   DateTime?
+  updated_at   DateTime?
+
+  order_item   order_item[]
+  user         user?         @relation(fields: [id_user], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  order_status order_status? @relation(fields: [id_status], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([id])
+  @@schema("formula")
+}
+
+model order_item {
+  id         Int       @id() @default(autoincrement())
+  id_order   Int?
+  id_ticket  Int?      @unique
+  id_event   Int
+  created_at DateTime?
+  updated_at DateTime?
+
+  tickets tickets? @relation(fields: [id_ticket], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  event   event?   @relation(fields: [id_event], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  orders  orders?  @relation(fields: [id_order], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([id])
+  @@schema("formula")
+}
+
+model tickets {
+  id            Int      @id() @default(autoincrement())
+  id_order_item Int?
+  qr_code       String?  @db.VarChar(30)
+  is_active     Int?
+  price         Decimal? @db.Decimal(19, 6)
+
+  order_item order_item?
+
+  @@index([id])
+  @@schema("formula")
+}
+
+model event {
+  id         Int       @id() @default(autoincrement())
+  id_status  Int?
+  name       String?
+  event_date DateTime?
+  create_at  DateTime?
+  updated_at DateTime?
+
+  order_item   order_item[]
+  event_status event_status? @relation(fields: [id_status], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([id])
+  @@schema("formula")
+}
+
+model event_status {
+  id   Int     @id() @default(autoincrement())
+  name String?
+
+  event event[]
+
+  @@index([id])
+  @@schema("formula")
 }
