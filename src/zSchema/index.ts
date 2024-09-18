@@ -16,24 +16,16 @@ export class ZodSchema {
     id_role: z.number()
   });
 
-  // static ZAddDataCalendar = z.object({
-  //   title: z.string(),
-  //   user: z.array(
-  //     z.string()
-  //   ).nullable().optional(),
-  //   date_start: z.string(),
-  //   date_end: z.string()
-  // })
+  static ZAddEvent = z.object({
+    name: z.string(),
+    event_date: z.string()
+  })
 
-  // static ZEditDataCalendar = z.object({
-  //   id: z.number(),
-  //   title: z.string(),
-  //   user: z.array(
-  //     z.string()
-  //   ).nullable().optional(),
-  //   date_start: z.string(),
-  //   date_end: z.string()
-  // })
+  static ZEditEvent = z.object({
+    id_event: z.number(),
+    name: z.string(),
+    event_date: z.string()
+  })
 
   static convertZodToJsonSchema(schema: any, schemaName: string) {
     const jsonSchema = zodToJsonSchema(schema, schemaName);
