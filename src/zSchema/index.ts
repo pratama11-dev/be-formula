@@ -24,7 +24,31 @@ export class ZodSchema {
   static ZEditEvent = z.object({
     id_event: z.number(),
     name: z.string(),
-    event_date: z.string()
+    event_date: z.string(),
+    id_status: z.number()
+  })
+
+  static ZAddTicket = z.object({
+    name: z.string(),
+    type_ticket: z.string(),
+    email: z.string(),
+    no_doc: z.string(),
+    price: z.string(),
+    id_event: z.number(),
+    type_doc: z.string(),
+    ticketHolders: z.array(
+      z.object({
+        name: z.string(),
+        email: z.string(),
+        no_doc: z.string(),
+        type_doc_type_holder: z.string()
+      })
+    ),
+    attachment: z.array(
+      z.object({
+       upload: z.string()
+      })
+    )
   })
 
   static convertZodToJsonSchema(schema: any, schemaName: string) {

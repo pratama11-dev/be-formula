@@ -29,6 +29,9 @@ export const ListEvent = async (req: Request, res: Response) => {
             include: {
                 event_status: true,
                 order_item: true
+            },
+            orderBy: {
+                event_date: "asc"
             }
         })
 
@@ -59,7 +62,7 @@ export const CreateEvent = async (req: Request, res: Response) => {
 
         const data = await req.prisma.event.create({
             data: {
-                id_status: 1,
+                id_status: 2,
                 name: input?.name,
                 event_date: moment(input?.event_date).toISOString(),
             }
@@ -82,7 +85,7 @@ export const UpdateEvent = async (req: Request, res: Response) => {
                 id: input?.id_event
             },
             data: {
-                id_status: 1,
+                id_status: input?.id_status,
                 name: input?.name,
                 event_date: moment(input?.event_date).toISOString(),
             }
@@ -99,13 +102,13 @@ export const UpdateEvent = async (req: Request, res: Response) => {
 export const DeleteEvent = async (req: Request, res: Response) => {
     try {
         const i = z.object({
-            id: z.string()
-        }).parse(req.params);
+            id: z.number()
+        }).parse(req.body);
 
 
         const data = await req.prisma.event.delete({
             where: {
-                id: parseInt(i?.id)
+                id: i?.id
             }
         })
 

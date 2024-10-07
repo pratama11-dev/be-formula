@@ -11,13 +11,15 @@ datasource db {
 }
 
 model user {
-  id         Int       @id() @default(autoincrement())
-  id_role    Int?
-  name       String?
-  email      String?   @unique(map: "UQ__user__AB6E61649A5D8E7D")
-  password   String?   @db.VarChar(255)
-  created_at DateTime?
-  updated_at DateTime?
+  id          Int       @id() @default(autoincrement())
+  id_role     Int?
+  name        String?
+  type_doc    String?
+  no_document String?
+  email       String?   @unique(map: "UQ__user__AB6E61649A5D8E7D")
+  password    String?   @db.VarChar(255)
+  created_at  DateTime?
+  updated_at  DateTime?
 
   user_role user_role? @relation(fields: [id_role], references: [id])
   orders    orders[]
@@ -38,8 +40,8 @@ model user_role {
 
 // order
 model order_status {
-  id     Int  @id() @default(autoincrement())
-  status Int?
+  id     Int     @id() @default(autoincrement())
+  status String?
 
   orders orders[]
 
@@ -52,25 +54,42 @@ model orders {
   id_user      Int?
   id_status    Int?
   total_amount Int?
+  remark       String?
   total_price  Decimal?  @db.Decimal(19, 6)
   created_at   DateTime?
   updated_at   DateTime?
 
-  order_item   order_item[]
-  user         user?         @relation(fields: [id_user], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  order_status order_status? @relation(fields: [id_status], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  order_item       order_item[]
+  order_attachment order_attachment[]
+  user             user?              @relation(fields: [id_user], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  order_status     order_status?      @relation(fields: [id_status], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([id])
+  @@schema("formula")
+}
+
+model order_attachment {
+  id              Int       @id @default(autoincrement())
+  id_order        Int?
+  file_attachment String?   @db.VarChar(300)
+  last_updated_by Int?
+  created_at      DateTime?
+
+  orders orders? @relation(fields: [id_order], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([id])
   @@schema("formula")
 }
 
 model order_item {
-  id         Int       @id() @default(autoincrement())
-  id_order   Int?
-  id_ticket  Int?      @unique
-  id_event   Int
-  created_at DateTime?
-  updated_at DateTime?
+  id          Int       @id() @default(autoincrement())
+  id_order    Int?
+  id_ticket   Int?      @unique
+  id_event    Int
+  type_ticket String?
+  price       Decimal?  @db.Decimal(19, 6)
+  created_at  DateTime?
+  updated_at  DateTime?
 
   tickets tickets? @relation(fields: [id_ticket], references: [id], onDelete: NoAction, onUpdate: NoAction)
   event   event?   @relation(fields: [id_event], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -81,11 +100,14 @@ model order_item {
 }
 
 model tickets {
-  id            Int      @id() @default(autoincrement())
-  id_order_item Int?
-  qr_code       String?  @db.VarChar(30)
-  is_active     Int?
-  price         Decimal? @db.Decimal(19, 6)
+  id               Int      @id() @default(autoincrement())
+  // id_order_item    Int?
+  qr_code          String?  @db.VarChar(30)
+  ticket_owner     String?  @db.VarChar(50)
+  doc_ticket_owner String?  @db.VarChar(50)
+  type_doc         String?
+  is_active        Int?
+  price            Decimal? @db.Decimal(19, 6)
 
   order_item order_item?
 
