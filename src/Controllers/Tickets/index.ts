@@ -85,6 +85,7 @@ export const createTicket = async (req: Request, res: Response) => {
                 data: {
                     id_role: 2,
                     name: input?.name,
+                    email: input?.email,
                     type_doc: input?.type_doc,
                     no_document: input?.no_doc
                 }
@@ -169,20 +170,51 @@ export const deleteTicket = async (req: Request, res: Response) => {
     try {
         const i = z.object({
             id: z.number(),
-            id_order_item: z.number()
         }).parse(req.body);
 
         const dataOrderItem = await req.prisma.order_item.delete({
             where: {
-                id: i?.id_order_item
+                id: i?.id
             }
         })
         
         const data = await req.prisma.tickets.delete({
             where: {
-                id: i?.id
+                id: dataOrderItem?.id_ticket
             }
         })
+
+        const findOrder = await req.prisma.orders.findFirstOrThrow({
+            where: {
+                id: dataOrderItem?.id_order
+            },
+            include: {
+                order_item: true,
+                order_attachment: true
+            }
+        })
+
+        if (findOrder.order_item.length < 1) {
+            if (findOrder?.order_attachment.length > 0) {
+                await req.prisma.order_attachment.deleteMany({
+                    where: {
+                        id_order: findOrder?.id
+                    }
+                })
+            }
+
+            await req.prisma.orders.delete({
+                where: {
+                    id: findOrder?.id
+                }
+            })
+
+            await req.prisma.user.delete({
+                where: {
+                    id: findOrder?.id_user
+                }
+            })
+        }
         
         return res.status(200).json({
             data: data,
@@ -223,12 +255,45 @@ export const listOrder = async (req: Request, res: Response) => {
 
         const count = await req.prisma.orders.count({})
 
-
         return res.status(200).json({
             data: data,
             total: count
         })
     } catch (error) {
         return defaultErrorHandling(res, error)
+    }
+}
+
+export const scanTicket = async (req: Request, res: Response) => {
+    try {
+        const i = z.object({
+            qr_code: z.string(),
+        }).parse(req.body);
+
+        const findData = await req.prisma.tickets.findFirstOrThrow({
+            where: {
+                qr_code: i?.qr_code
+            }
+        })
+
+        // check valid
+        if (findData?.is_active === 1) {
+            throw new Error("Ticket sudah discan!");
+        }
+
+        const scanTicket = await req.prisma.tickets.update({
+            where: {
+                id: findData?.id
+            },
+            data: {
+                is_active: 1   
+            }
+        })
+        
+        return res.status(200).json({
+            data: scanTicket,
+        })
+    } catch (error) {
+        return defaultErrorHandling(res, error)        
     }
 }

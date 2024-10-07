@@ -3,7 +3,7 @@ import passport from 'passport';
 import { checkAuth } from '../Middleware/checkAuth';
 import { getListUser, getSessions } from '../Controllers/Users';
 import { CreateEvent, DeleteEvent, ListEvent, UpdateEvent } from '../Controllers/Event';
-import { createTicket, deleteTicket, listOrder, ticketList } from '../Controllers/Tickets';
+import { createTicket, deleteTicket, listOrder, scanTicket, ticketList } from '../Controllers/Tickets';
 
 const router = Router();
 
@@ -25,6 +25,7 @@ router.post("/event/delete", DeleteEvent)
 router.post("/ticket", ticketList)
 router.post("/ticket/create", createTicket)
 router.post("/ticket/delete", deleteTicket)
+router.post("/ticket/qr-scan", scanTicket)
 
 // order
 router.post("/order", listOrder)
