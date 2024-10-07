@@ -107,7 +107,7 @@ export const createTicket = async (req: Request, res: Response) => {
                 id_user: user?.id,
                 id_status: 1,
                 total_amount: input?.ticketHolders?.length ?? 0,
-                total_price: parseFloat(input?.price) * input?.ticketHolders?.length ?? 0,
+                total_price: parseFloat(input?.price || "0") * (input?.ticketHolders?.length ?? 0),
                 created_at: DateUtil?.CurDate(),
             }
         })
